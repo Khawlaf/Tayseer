@@ -32,7 +32,7 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
     //textController2 = TextEditingController();
     passwordVisibility = false;
   }
- progressDialogue(BuildContext context) {
+/* progressDialogue(BuildContext context) {
     //set up the AlertDialog
     AlertDialog alert = AlertDialog(
       backgroundColor: Colors.transparent,
@@ -99,7 +99,7 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
             );
           });
     }
-  }
+  }*/
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -150,7 +150,7 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(30, 10, 30, 0),
                   child: TextFormField(
-                    controller: textController1,
+                    controller: driverIDController,
                     obscureText: false,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -202,7 +202,7 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(30, 10, 30, 0),
                   child: TextFormField(
-                    controller: textController2,
+                    controller: passwordController,
                     obscureText: !passwordVisibility,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
