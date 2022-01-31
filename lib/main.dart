@@ -7,20 +7,27 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() async {
+   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Tayseer',
+    return MultiProvider(
+      providers: [
+        Provider<AuthService>(
+          create: (_) => AuthService(FirebaseAuth.instance),
+        ),
+        StreamProvider(
+          create: (context) => context.read<AuthService>().authStateChanges,
+        ),
+      ],
+      child: MaterialApp(
+         title: 'Tayseer',
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -29,6 +36,21 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: const [Locale('en', '')],
       theme: ThemeData(primarySwatch: Colors.blue),
       home: LogInPageWidget(),
+      ),
     );
   }
 }
+
+class AuthWrapper extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    final user = context.watch<User>();
+
+    if(user != null){
+      return SplashScreen();
+    }
+    return MainScreen();
+  }
+
+}
+
