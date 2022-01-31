@@ -4,6 +4,12 @@ import '../flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebasetest/services/auth_services.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 class LogInPageWidget extends StatefulWidget {
   const LogInPageWidget({Key key}) : super(key: key);
 
@@ -12,10 +18,9 @@ class LogInPageWidget extends StatefulWidget {
 }
 
 class _LogInPageWidgetState extends State<LogInPageWidget> {
-  //TextEditingController textController1;
-  //TextEditingController textController2;
-  final passIDController = new TextEditingController();
-  final passPasswordController = new TextEditingController();
+   TextEditingController emailController = new TextEditingController();
+  TextEditingController passwordController = new TextEditingController();
+  TextEditingController driverIDController = new TextEditingController();
   bool passwordVisibility=false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -53,7 +58,7 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
     progressDialogue(context);
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: passEmailController.text,
+          email: passIDController.text,
           password: passPasswordController.text);
       Navigator.of(context)
           .push(MaterialPageRoute(builder: (context) => WelcomePageWidget()));
@@ -258,8 +263,12 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
                         print("الرجاء إدخال كلمةالسر")
                       }
                       else{
-                        QuerySnapshot snap = await FirebaseFireStore.instance.collection(Car_driver)
+                         QuerySnapshot snap = await FirebaseFirestore.instance.collection(Car_driver)
                         .where("DriverID",isEqualTo: DriverID).get();
+                           context.read<AuthService>().login(
+                        snap.docs[0]['email'],
+                        password,
+                      );
                       }
                     },
                     text: 'تسجيل الدخول',
