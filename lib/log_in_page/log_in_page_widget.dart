@@ -12,20 +12,89 @@ class LogInPageWidget extends StatefulWidget {
 }
 
 class _LogInPageWidgetState extends State<LogInPageWidget> {
-  TextEditingController textController1;
-  TextEditingController textController2;
-  bool passwordVisibility;
+  //TextEditingController textController1;
+  //TextEditingController textController2;
+  final passIDController = new TextEditingController();
+  final passPasswordController = new TextEditingController();
+  bool passwordVisibility=false;
   final formKey = GlobalKey<FormState>();
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    textController1 = TextEditingController();
-    textController2 = TextEditingController();
+    //textController1 = TextEditingController();
+    //textController2 = TextEditingController();
     passwordVisibility = false;
   }
+ progressDialogue(BuildContext context) {
+    //set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
+    showDialog(
+      //prevent outside touch
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        //prevent Back button press
+        return WillPopScope(onWillPop: () {}, child: alert);
+      },
+    );
+  }
 
+  _logIn() async {
+    progressDialogue(context);
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: passEmailController.text,
+          password: passPasswordController.text);
+      Navigator.of(context)
+          .push(MaterialPageRoute(builder: (context) => WelcomePageWidget()));
+    } on FirebaseAuthException catch (e) {
+      Navigator.pop(context);
+      var message = '';
+      switch (e.code) {
+        case 'invalid-email':
+          message = 'invalid email';
+          break;
+        case 'user-disabled':
+          message = 'the user is disabeld';
+          break;
+        case 'user-not-found':
+          message = 'user not found';
+          break;
+        case 'wrong-password':
+          message = 'incorrect password';
+          break;
+             case 'too-many-requests':
+          message =
+              'user blocked for sometime due to many wrong attempts.Try again later';
+          break;
+      }
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Log in failed'),
+              content: Text(message),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('ok')),
+              ],
+            );
+          });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -178,8 +247,20 @@ class _LogInPageWidgetState extends State<LogInPageWidget> {
                 Padding(
                   padding: EdgeInsetsDirectional.fromSTEB(0, 100, 0, 0),
                   child: FFButtonWidget(
-                    onPressed: () {
-                      print('Button pressed ...');
+                    onPressed: ()async {
+                      final String DriverID =passIDController.text.trim();
+                      final String Password=passPasswordController.text.trim();
+
+                      if(DriverID.isEmpty){
+                        print("الرجاء إادخال رقم الهوية/الإقامة")
+                      }
+                       if(Password.isEmpty){
+                        print("الرجاء إدخال كلمةالسر")
+                      }
+                      else{
+                        QuerySnapshot snap = await FirebaseFireStore.instance.collection(Car_driver)
+                        .where("DriverID",isEqualTo: DriverID).get();
+                      }
                     },
                     text: 'تسجيل الدخول',
                     options: FFButtonOptions(
